@@ -1,13 +1,55 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useState} from 'react';
+import { StyleSheet, Text, View, FlatList, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import Header from './components/header';
+import TodoItem from './components/todoItem';
+import InputForm from './components/inputForm';
 
 export default function App() {
+
+  const [todo, setTodo] = useState([
+    {text: "kaam Karle Kuch to", key: '1'},
+    {text: "nalayak kahinka", key: '2'}
+  ]);
+
+  const handlePress = (key) => {
+    setTodo((prevtodo) => {
+      return prevtodo.filter((item) => item.key != key)
+    })
+  }
+
+  const buttonClick = (text) => {
+    if (text.length > 1){
+      setTodo((prevtodo) => {
+        return [{text: text , key: Math.random().toString()},
+         ...prevtodo];
+       })
+    }
+    else{
+      Alert.alert( 'OOPS!', 'Please write something before adding', [
+        {text: 'Ok', onPress: () => {console.log('added')}}
+      ])
+    }
+  
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss();}}>
+      <View style={styles.container}>
+        <Header />
+          <View style={styles.content}>
+            <InputForm buttonClick={buttonClick} />
+            <View style={styles.list}>
+              <FlatList 
+                data = {todo}
+                renderItem = { ({ item }) => (
+                  <TodoItem  item={item} handlePress={handlePress}/>           
+                )}
+              />
+            </View>
+          </View>
+      </View>
+    </TouchableWithoutFeedback>
+    
   );
 }
 
@@ -15,7 +57,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  },
+  content: {
+    flex: 1,
+    padding: 40,
+  },
+  list: {
+    flex: 1,
+    marginTop: 20,
   },
 });
